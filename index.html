@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AS-Sur — how the Physicianeers 2026 WhatsApp bot works</title>
+<meta name="description" content="A short, honest explanation of how the AS-Sur WhatsApp bot answers the Physicianeers 2026 cohort's logistics questions from the hub - and how to use it.">
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1d21;
+    --muted: #5c6570;
+    --line: #e3e7ec;
+    --card: #f6f8fa;
+    --code-bg: #f3f5f8;
+    --accent: #0f7b6c;
+    --accent-soft: #e6f4f1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171a;
+      --fg: #e8eaed;
+      --muted: #a2abb5;
+      --line: #2b3035;
+      --card: #1c2024;
+      --code-bg: #1a1e22;
+      --accent: #5fd0bb;
+      --accent-soft: #1b2a29;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 17px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  main { max-width: 44rem; margin: 0 auto; padding: 2rem 1.15rem 4rem; }
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .4rem; letter-spacing: -0.02em; }
+  h2 {
+    font-size: 1.3rem; margin: 2.75rem 0 .75rem;
+    padding-top: 1.5rem; border-top: 1px solid var(--line);
+    letter-spacing: -0.01em;
+  }
+  h3 { font-size: 1.02rem; margin: 1.6rem 0 .4rem; }
+  p, li { color: var(--fg); }
+  .lede { font-size: 1.1rem; color: var(--muted); margin: 0 0 1.5rem; }
+  ul, ol { padding-left: 1.25rem; }
+  li { margin: .35rem 0; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: .88em;
+    background: var(--code-bg);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: .1em .35em;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: .9rem 1rem;
+    overflow-x: auto;
+    font-size: .82rem;
+    line-height: 1.5;
+  }
+  pre code { background: none; border: 0; padding: 0; font-size: 1em; }
+  .diagram { font-size: .74rem; line-height: 1.35; }
+  @media (min-width: 30rem) { .diagram { font-size: .84rem; } }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 1rem 1.15rem;
+    margin: 1.25rem 0;
+  }
+  .ar {
+    background: var(--accent-soft);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 1rem 1.15rem;
+    margin: 1.25rem 0;
+    font-size: 1.05rem;
+    line-height: 1.9;
+  }
+  [dir="rtl"] ul { padding-left: 0; padding-right: 1.25rem; }
+  [dir="rtl"] code { direction: ltr; unicode-bidi: embed; }
+  .tag {
+    display: inline-block;
+    font-size: .72rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    padding: .1rem .5rem;
+    margin-bottom: 1rem;
+  }
+  .note { font-size: .94rem; color: var(--muted); }
+  a { color: var(--accent); }
+  table { display: none; }
+  footer {
+    margin-top: 3rem; padding-top: 1.25rem;
+    border-top: 1px solid var(--line);
+    font-size: .9rem; color: var(--muted);
+  }
+  .stat { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<main>
+
+  <span class="tag">Physicianeers 2026</span>
+  <h1>AS-Sur: a WhatsApp bot that only answers from the hub</h1>
+  <p class="lede">What it does, how to use it, and how it was built — in about five minutes.</p>
+
+  <p>AS-Sur sits in the cohort's WhatsApp group and answers questions about logistics:
+  pass marks, retake rules, deadlines, lecture links, which file is where. Everything it
+  says comes from the
+  <a href="https://mtc-qa-hub.vercel.app/">Physicianeers 2026 hub</a> and nowhere else.
+  It is not a general-purpose chatbot: if the hub does not contain the answer, it tells you
+  that instead of inventing one.</p>
+
+  <h2>How to use it</h2>
+
+  <div class="ar" dir="rtl" lang="ar">
+    <strong>إزاي تستخدمه؟</strong>
+    <p>جوه جروب الدفعة، تقدر تنده عليه بتلات طرق:</p>
+    <ul>
+      <li>تكتب <code>?sur</code> وبعدها سؤالك — مثال: <code>?sur درجة النجاح في المادة كام؟</code></li>
+      <li>تعمل منشن (mention) للبوت في رسالتك وتسأل</li>
+      <li>أو ترد (reply) على أي رسالة من رسايله</li>
+    </ul>
+    <p>بيرد بنفس لغة السؤال: تسأل بالعربي يرد بالعربي، تسأل بالإنجليزي يرد بالإنجليزي.</p>
+    <p>وأهم حاجة: هو بيجاوب من الموقع (الهاب) <strong>بس</strong>. لو الحاجة مش مكتوبة هناك،
+    هيقولك بصراحة «مش لاقي الحاجة دي، اسأل الممثل أو شوف الموقع» — مش بيخمّن ومش بيألف.</p>
+    <p>ومش بيتكلم غير لما تنده عليه. أي كلام تاني في الجروب مش بيقراه ولا بيرد عليه، ومش بيرد
+    في الرسايل الخاصة خالص.</p>
+  </div>
+
+  <p><strong>In English:</strong> in the group, summon it in one of three ways — start your
+  message with <code>?sur</code>, @mention it, or reply to one of its own messages. It
+  answers in whichever language you asked in. It answers only from the hub, and when the
+  hub does not cover your question it says so and points you to your representative or the
+  site. It never speaks unless summoned.</p>
+
+  <h2>How it was made</h2>
+
+  <p>One small program, always running, doing four jobs. No magic anywhere in it.</p>
+
+<pre class="diagram"><code>        WhatsApp group
+              |
+              |  someone summons the bot
+              v
+      +-----------------+       +----------------------+
+      |    the bot      | <---- |   the hub's content  |
+      |  (one process)  |       |  database + web page |
+      +-----------------+       +----------------------+
+              |
+              |  the question + ALL the hub's text
+              v
+      +-----------------+
+      |     Gemini      |   "answer ONLY from this text"
+      +-----------------+
+              |
+              |  an answer, or the word NO_ANSWER
+              v
+     a reply in the group, or an honest "I can't find this"
+</code></pre>
+
+  <h3>1. Reading the hub's data</h3>
+  <p>The hub keeps its content in Firestore — a hosted database that a website can read
+  directly from the browser. Because the hub's content is public, the bot can read the same
+  data over ordinary web requests with no password, exactly as a visitor's browser does.
+  It pulls ten collections (announcements, exams, answered questions, files, deadlines,
+  lecture schedule, and so on) and flattens them into one long labelled text document —
+  we call it the <em>digest</em>. Every line carries its source, e.g.
+  <code>[EXAM RULES] درجة النجاح في المادة: ٧٠</code>.</p>
+  <p>Some of the hub's content is not in the database at all — the exam rules and the
+  meeting-notes Q&amp;A are written directly into the page — so the bot also fetches the page
+  itself and reads those out of it.</p>
+
+  <h3>2. Asking Gemini, with the data attached</h3>
+  <p>The digest is small enough to hand the model in full. So on every question the bot
+  sends Gemini two things: the whole digest, and the student's question — plus firm
+  instructions to answer <em>only</em> from the digest and to reply with the exact word
+  <code>NO_ANSWER</code> if the answer is not in there. The temperature is set to 0, which
+  means "be as deterministic as you can, do not be creative".</p>
+
+  <h3>3. Listening on WhatsApp</h3>
+  <p>WhatsApp has an official business interface, but it does not support group chats at
+  all. Group participation is only possible by connecting as a <em>linked device</em>, the
+  same way WhatsApp Web does — which is against WhatsApp's terms of service, and the account
+  can be banned for it. That is a real trade-off, taken knowingly: the bot therefore runs on
+  a dedicated spare number, never anyone's personal one, and it never messages anybody
+  first.</p>
+  <p>Because it keeps a live connection open, it needs a machine that is always on. It runs
+  as a small always-on service on a cloud server with automatic restart.</p>
+
+  <h3>4. Deciding when to speak</h3>
+  <p>This is the part most of the care went into. In a group of ~166 people, the failure that
+  gets a bot thrown out is not a wrong answer — it is noise. So the rule is written to
+  <strong>fail closed</strong>: anything the code cannot prove is a summons results in
+  silence. Wrong group, no summons, an empty question, the bot's own messages, direct
+  messages, someone's <code>@everyone</code> broadcast that happens to tag the bot along with
+  everybody else — all silence. There are also limits: at most one reply per message, one
+  reply per person every 10 seconds, and 30 per group per hour. When it hits a limit it goes
+  quiet rather than announcing it.</p>
+
+  <h2>Simple code</h2>
+  <p class="note">Three ideas, simplified for reading. The real code has error handling,
+  caching and tests around each of these; the shape below is honest, but it is not
+  copy-paste ready.</p>
+
+  <h3>Reading a database collection over plain HTTP</h3>
+<pre><code>const base = "https://firestore.googleapis.com/v1";
+const project = "mtc-qa-hub";
+
+async function readCollection(name) {
+  const url = `${base}/projects/${project}/databases/(default)/documents/${name}`;
+  const response = await fetch(url);
+  const data = await response.json();
+  return data.documents ?? [];
+}
+
+// announcements, exams, questions, files, deadlines, schedule, ...
+</code></pre>
+  <p class="note">No SDK, no credentials — the data is public, so it is just a URL.</p>
+
+  <h3>The instruction that keeps it honest</h3>
+<pre><code>const instructions = `
+Answer ONLY from the CONTENT below. Never use outside knowledge.
+Never guess. Never invent a rule, date, grade, or policy.
+If the CONTENT does not clearly answer the question,
+reply with exactly: NO_ANSWER
+
+Mirror the user's language: Arabic question, Arabic answer.
+Be brief - this is WhatsApp, not an essay. Maximum 3 short lines.
+
+CONTENT:
+${digest}`;
+</code></pre>
+  <p class="note">If the reply is <code>NO_ANSWER</code>, the bot never shows that word to
+  students — it swaps it for the bilingual "I can't find this, ask your rep or check the
+  site".</p>
+
+  <h3>Deciding whether it was summoned</h3>
+<pre><code>function isSummoned(message) {
+  if (message.fromMe) return false;                    // never itself
+  if (!message.chatId.endsWith("@g.us")) return false;  // groups only
+  if (!allowedGroups.includes(message.chatId)) return false;  // ours only
+
+  return message.text.startsWith("?sur")        // the prefix
+    || message.mentionedIds.includes(botId)     // an @mention
+    || message.isReplyToBot;                    // a reply to it
+}
+// anything else: stay silent, and do not even log it
+</code></pre>
+
+  <h2>Three things we learned</h2>
+
+  <h3>Not every AI app needs a vector database</h3>
+  <p>The standard advice is to chop your documents up, turn each piece into numbers
+  ("embeddings"), store them in a special database, and at question time retrieve only the
+  pieces that look relevant. That is called RAG, and it exists because models can only read
+  so much text at once.</p>
+  <p>We measured the hub first: 86 documents, about 86 KB of text — roughly
+  <span class="stat">15,000</span> tokens (a token is a chunk of a word; the model's reading
+  limit is counted in these). That fits comfortably in a single request. So there is no
+  vector database, no embeddings and no chunking here: the entire knowledge base is sent with
+  every single question. The model sees everything, every time, so nothing can be missed by a
+  bad retrieval step — and there is a whole moving part that simply does not exist and
+  therefore cannot break. Measure before you architect.</p>
+
+  <h3>Waiting for changes beat asking for them — cheaper <em>and</em> fresher</h3>
+  <p>The first version re-read the whole hub every 10 minutes. That is roughly
+  <span class="stat">12,800</span> database reads a day, and an answer could still be up to
+  10 minutes out of date.</p>
+  <p>Switching to real-time listeners — where the database pushes a notification when
+  something actually changes, instead of the bot repeatedly asking — cost about
+  <span class="stat">100</span> reads a day with effectively no staleness. Both numbers moved
+  the right way at once, because reads are billed only for documents that really change, and
+  an idle database costs nothing. It mattered for more than money: those reads come from the
+  same free quota the students' own website depends on, so a chatty bot would have degraded
+  the site it serves. (A slow re-read still runs a few times a day, purely as a safety net in
+  case a listener dies quietly.)</p>
+
+  <h3>Refusing to answer is a feature, not a failure</h3>
+  <p>The content here is exam rules and programme policy. A confidently wrong answer about a
+  pass mark is far more damaging than no answer at all — a student can act on "I don't know,
+  ask your rep"; they cannot recover from a made-up retake rule. So refusal was designed in
+  from the start, tested for deliberately, and it is why the prompt has that
+  <code>NO_ANSWER</code> escape hatch. The refusal message and the "something broke
+  technically" message are also kept as two different sentences, because they ask the student
+  to do two different things.</p>
+
+  <p class="card"><strong>A bonus lesson in looking before assuming.</strong> A student asked
+  for a lecture link and the bot said it could not find it — even though the link was plainly
+  visible on the hub. It turned out the lecture and lab links were hardcoded inside the
+  page's own JavaScript, not stored in the database the admin screen writes to. The bot was
+  reading the database and the links were never there. Your data is where it actually is, not
+  where the architecture diagram says it should be.</p>
+
+  <h2>What it cannot do</h2>
+  <ul>
+    <li>It knows only what the hub publishes. If the hub is silent or out of date, so is
+    the bot.</li>
+    <li>It will decline anything else — medical questions, study advice, general knowledge,
+    opinions. It has no policy of its own and will not offer one.</li>
+    <li>It cannot see the whole conversation. Each question is answered on its own, with no
+    memory of what came before.</li>
+    <li>It never starts a conversation, never sends direct messages, and only reads the
+    messages that summon it. Everything else in the group is ignored and never leaves the
+    program.</li>
+  </ul>
+
+  <footer>
+    <p>Built for the Physicianeers 2026 cohort. Source of truth:
+    <a href="https://mtc-qa-hub.vercel.app/">mtc-qa-hub.vercel.app</a>.</p>
+  </footer>
+
+</main>
+</body>
+</html>
