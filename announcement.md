@@ -1,41 +1,28 @@
 # Announcement message
 
-Paste into the student groups as plain text. Only WhatsApp-compatible emphasis is used
-(`*bold*`); no backticks, no tables, since WhatsApp renders neither.
+Paste into the student group as plain text. Only WhatsApp-compatible emphasis is used
+(single asterisks for bold); no backticks and no tables, because WhatsApp renders both
+literally — a student copying a backtick into the group would stop the trigger firing.
 
 ---
 
-*AS-Sur — البوت اللي بيجاوب على أسئلة الدفعة* 🤖
+*AS-Sur — the bot that answers the cohort's questions* 🤖
 
-حاطينلكم في الجروب بوت اسمه *AS-Sur* بيجاوب على أسئلة اللوجستيات: درجات النجاح، قواعد الامتحانات، الديدلاينز، لينكات المحاضرات، الملفات… وكل إجاباته بتيجي من موقع الهاب بس، مش من أي مكان تاني.
+We added a bot called *AS-Sur* to the group. It answers logistics questions — pass marks, retake rules, deadlines, lecture links, which file is where — and every answer comes from the Physicianeers 2026 hub only, nowhere else.
 
-*إزاي تنده عليه؟* تلات طرق:
-• تكتب *?sur* وبعدها سؤالك
-• تعمل له منشن في الرسالة
-• أو ترد (reply) على أي رسالة من رسايله
-
-*مثال:*
-?sur درجة النجاح في المادة كام؟
-
-*مهم تعرف:*
-• بيرد بنفس لغة سؤالك — عربي أو إنجليزي
-• بيجاوب من الهاب *بس*، ولو الحاجة مش مكتوبة هناك هيقولك بصراحة إنه مش لاقيها ويحوّلك للممثل أو للموقع — مش بيخمّن ومش بيألف
-• مش بيتكلم غير لما تنده عليه، وباقي كلام الجروب مش بيقراه
-
-لو عايز تعرف اتعمل إزاي (شرح بسيط بالكود):
-https://gegesay89.github.io/as-sur-how-it-works/
-
----
-
-*In English:* we added a bot called *AS-Sur* to the group. It answers logistics questions — pass marks, exam rules, deadlines, lecture links, files — using only the hub as its source.
-
-Summon it in one of three ways:
+*How to summon it* — three ways:
 • start your message with *?sur* then your question
-• @mention it
-• reply to one of its messages
+• @mention it in your message
+• or reply to any one of its own messages
 
-Example: ?sur what is the pass mark for the subject?
+*Example:*
+?sur what is the pass mark for the subject?
 
-It replies in whichever language you ask in. It answers only from the hub, and when the hub does not cover your question it says so and points you to your rep or the site instead of guessing. It stays silent unless you summon it.
+*Worth knowing:*
+• it replies in whichever language you ask in — Arabic or English
+• it answers from the hub *only*; if something is not written there it tells you plainly that it cannot find it and points you to your rep or the site — it does not guess and it does not invent
+• it never speaks unless you summon it, and it does not read the rest of the group's chat
+• it never sends direct messages
 
-How it was built: https://gegesay89.github.io/as-sur-how-it-works/
+A simple explanation of how it works, with code:
+https://gegesay89.github.io/as-sur-how-it-works/

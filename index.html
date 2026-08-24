@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AS-Sur — how the Physicianeers 2026 WhatsApp bot works</title>
+<title>WhatsApp bot — simple how to do</title>
 <meta name="description" content="A short, honest explanation of how the AS-Sur WhatsApp bot answers the Physicianeers 2026 cohort's logistics questions from the hub - and how to use it.">
 <style>
   :root {
@@ -55,7 +55,16 @@
     border: 1px solid var(--line);
     border-radius: 5px;
     padding: .1em .35em;
+    /* Short trigger tokens like ?sur must never split across two lines:
+       browsers otherwise treat the "?" as a break opportunity and a reader
+       can conclude the trigger is "sur" or "? sur". */
+    white-space: nowrap;
   }
+  /* Opt-out for long illustrative chips that are wider than a narrow phone:
+     they may wrap between words, while `.nb` keeps a typed token unbreakable
+     inside them. Nobody types the long ones, so wrapping them is harmless. */
+  code.wrap { white-space: normal; }
+  code .nb { white-space: nowrap; }
   pre {
     background: var(--code-bg);
     border: 1px solid var(--line);
@@ -65,8 +74,27 @@
     font-size: .82rem;
     line-height: 1.5;
   }
-  pre code { background: none; border: 0; padding: 0; font-size: 1em; }
+  /* Must come after `code { white-space: nowrap }` so the block form keeps its
+     own line breaks and its internal horizontal scrolling. */
+  pre code { background: none; border: 0; padding: 0; font-size: 1em; white-space: pre; }
+  /* CSS-only cue that a block still scrolls sideways: the two edge shadows are
+     fixed to the box while the two background-coloured covers scroll with the
+     content, so a shadow is only visible on a side that has hidden content. */
+  pre.scrolls {
+    background-image:
+      linear-gradient(to right, var(--code-bg) 60%, rgba(0,0,0,0)),
+      linear-gradient(to left, var(--code-bg) 60%, rgba(0,0,0,0)),
+      radial-gradient(farthest-side at 0 50%, rgba(90,100,110,.30), rgba(0,0,0,0)),
+      radial-gradient(farthest-side at 100% 50%, rgba(90,100,110,.30), rgba(0,0,0,0));
+    background-position: 0 0, 100% 0, 0 0, 100% 0;
+    background-size: 2.5rem 100%, 2.5rem 100%, .75rem 100%, .75rem 100%;
+    background-repeat: no-repeat;
+    background-attachment: local, local, scroll, scroll;
+  }
   .diagram { font-size: .74rem; line-height: 1.35; }
+  /* Trimmed side padding buys the ASCII diagram a few more columns on a phone,
+     so it fits outright instead of hiding its right-hand half behind a swipe. */
+  @media (max-width: 29.99rem) { .diagram { padding-left: .55rem; padding-right: .55rem; } }
   @media (min-width: 30rem) { .diagram { font-size: .84rem; } }
   .card {
     background: var(--card);
@@ -75,17 +103,13 @@
     padding: 1rem 1.15rem;
     margin: 1.25rem 0;
   }
-  .ar {
+  .howto {
     background: var(--accent-soft);
     border: 1px solid var(--line);
     border-radius: 12px;
     padding: 1rem 1.15rem;
     margin: 1.25rem 0;
-    font-size: 1.05rem;
-    line-height: 1.9;
   }
-  [dir="rtl"] ul { padding-left: 0; padding-right: 1.25rem; }
-  [dir="rtl"] code { direction: ltr; unicode-bidi: embed; }
   .tag {
     display: inline-block;
     font-size: .72rem;
@@ -111,7 +135,7 @@
 <main>
 
   <span class="tag">Physicianeers 2026</span>
-  <h1>AS-Sur: a WhatsApp bot that only answers from the hub</h1>
+  <h1>WhatsApp bot — simple how to do</h1>
   <p class="lede">What it does, how to use it, and how it was built — in about five minutes.</p>
 
   <p>AS-Sur sits in the cohort's WhatsApp group and answers questions about logistics:
@@ -123,49 +147,49 @@
 
   <h2>How to use it</h2>
 
-  <div class="ar" dir="rtl" lang="ar">
-    <strong>إزاي تستخدمه؟</strong>
-    <p>جوه جروب الدفعة، تقدر تنده عليه بتلات طرق:</p>
+  <div class="howto">
+    <p><strong>Three ways to summon it</strong>, inside the cohort's group:</p>
     <ul>
-      <li>تكتب <code>?sur</code> وبعدها سؤالك — مثال: <code>?sur درجة النجاح في المادة كام؟</code></li>
-      <li>تعمل منشن (mention) للبوت في رسالتك وتسأل</li>
-      <li>أو ترد (reply) على أي رسالة من رسايله</li>
+      <li>Start your message with <code>?sur</code> followed by your question — for example:
+      <code class="wrap"><span class="nb">?sur</span> what is the pass mark for the subject?</code></li>
+      <li>@mention the bot in your message and ask</li>
+      <li>Or reply to any one of its own messages</li>
     </ul>
-    <p>بيرد بنفس لغة السؤال: تسأل بالعربي يرد بالعربي، تسأل بالإنجليزي يرد بالإنجليزي.</p>
-    <p>وأهم حاجة: هو بيجاوب من الموقع (الهاب) <strong>بس</strong>. لو الحاجة مش مكتوبة هناك،
-    هيقولك بصراحة «مش لاقي الحاجة دي، اسأل الممثل أو شوف الموقع» — مش بيخمّن ومش بيألف.</p>
-    <p>ومش بيتكلم غير لما تنده عليه. أي كلام تاني في الجروب مش بيقراه ولا بيرد عليه، ومش بيرد
-    في الرسايل الخاصة خالص.</p>
+    <p>It answers in whichever language you asked in: ask in Arabic and it replies in Arabic,
+    ask in English and it replies in English.</p>
+    <p>Most importantly, it answers from the hub <strong>only</strong>. If something is not
+    written there, it tells you plainly that it cannot find it and points you to your
+    representative or the site — it does not guess and it does not invent.</p>
+    <p>It never speaks unless summoned. Everything else in the group it does not read and
+    does not reply to, and it never replies in direct messages at all.</p>
   </div>
 
-  <p><strong>In English:</strong> in the group, summon it in one of three ways — start your
-  message with <code>?sur</code>, @mention it, or reply to one of its own messages. It
-  answers in whichever language you asked in. It answers only from the hub, and when the
-  hub does not cover your question it says so and points you to your representative or the
-  site. It never speaks unless summoned.</p>
+  <p class="note">In short: start with <code>?sur</code>, @mention it, or reply to it.</p>
 
   <h2>How it was made</h2>
 
   <p>One small program, always running, doing four jobs. No magic anywhere in it.</p>
 
-<pre class="diagram"><code>        WhatsApp group
-              |
-              |  someone summons the bot
-              v
-      +-----------------+       +----------------------+
-      |    the bot      | <---- |   the hub's content  |
-      |  (one process)  |       |  database + web page |
-      +-----------------+       +----------------------+
-              |
-              |  the question + ALL the hub's text
-              v
-      +-----------------+
-      |     Gemini      |   "answer ONLY from this text"
-      +-----------------+
-              |
-              |  an answer, or the word NO_ANSWER
-              v
-     a reply in the group, or an honest "I can't find this"
+<pre class="diagram scrolls"><code>   WhatsApp group
+        |
+        |  someone summons the bot
+        v
++---------------+  +-----------------+
+|    the bot    |&lt;-| the hub's data  |
+| (one process) |  | database + page |
++---------------+  +-----------------+
+        |
+        |  question + ALL the hub text
+        |  + "answer ONLY from this text"
+        v
++---------------+
+|    Gemini     |
++---------------+
+        |
+        |  an answer, or NO_ANSWER
+        v
+ a reply in the group, or an
+ honest "I can't find this"
 </code></pre>
 
   <h3>1. Reading the hub's data</h3>
@@ -175,7 +199,7 @@
   It pulls ten collections (announcements, exams, answered questions, files, deadlines,
   lecture schedule, and so on) and flattens them into one long labelled text document —
   we call it the <em>digest</em>. Every line carries its source, e.g.
-  <code>[EXAM RULES] درجة النجاح في المادة: ٧٠</code>.</p>
+  <code>[EXAM RULES] Pass mark: 70</code>.</p>
   <p>Some of the hub's content is not in the database at all — the exam rules and the
   meeting-notes Q&amp;A are written directly into the page — so the bot also fetches the page
   itself and reads those out of it.</p>
@@ -213,7 +237,7 @@
   copy-paste ready.</p>
 
   <h3>Reading a database collection over plain HTTP</h3>
-<pre><code>const base = "https://firestore.googleapis.com/v1";
+<pre class="scrolls"><code>const base = "https://firestore.googleapis.com/v1";
 const project = "mtc-qa-hub";
 
 async function readCollection(name) {
@@ -228,7 +252,7 @@ async function readCollection(name) {
   <p class="note">No SDK, no credentials — the data is public, so it is just a URL.</p>
 
   <h3>The instruction that keeps it honest</h3>
-<pre><code>const instructions = `
+<pre class="scrolls"><code>const instructions = `
 Answer ONLY from the CONTENT below. Never use outside knowledge.
 Never guess. Never invent a rule, date, grade, or policy.
 If the CONTENT does not clearly answer the question,
@@ -245,7 +269,7 @@ ${digest}`;
   site".</p>
 
   <h3>Deciding whether it was summoned</h3>
-<pre><code>function isSummoned(message) {
+<pre class="scrolls"><code>function isSummoned(message) {
   if (message.fromMe) return false;                    // never itself
   if (!message.chatId.endsWith("@g.us")) return false;  // groups only
   if (!allowedGroups.includes(message.chatId)) return false;  // ours only
