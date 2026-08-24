@@ -84,10 +84,10 @@
     background-image:
       linear-gradient(to right, var(--code-bg) 60%, rgba(0,0,0,0)),
       linear-gradient(to left, var(--code-bg) 60%, rgba(0,0,0,0)),
-      radial-gradient(farthest-side at 0 50%, rgba(90,100,110,.30), rgba(0,0,0,0)),
-      radial-gradient(farthest-side at 100% 50%, rgba(90,100,110,.30), rgba(0,0,0,0));
+      radial-gradient(farthest-side at 0 50%, rgba(80,90,100,.42), rgba(0,0,0,0)),
+      radial-gradient(farthest-side at 100% 50%, rgba(80,90,100,.42), rgba(0,0,0,0));
     background-position: 0 0, 100% 0, 0 0, 100% 0;
-    background-size: 2.5rem 100%, 2.5rem 100%, .75rem 100%, .75rem 100%;
+    background-size: 2.5rem 100%, 2.5rem 100%, .95rem 100%, .95rem 100%;
     background-repeat: no-repeat;
     background-attachment: local, local, scroll, scroll;
   }
@@ -199,7 +199,7 @@
   It pulls ten collections (announcements, exams, answered questions, files, deadlines,
   lecture schedule, and so on) and flattens them into one long labelled text document —
   we call it the <em>digest</em>. Every line carries its source, e.g.
-  <code>[EXAM RULES] Pass mark: 70</code>.</p>
+  <code class="wrap"><span class="nb">[EXAM RULES]</span> Pass mark: 70</code>.</p>
   <p>Some of the hub's content is not in the database at all — the exam rules and the
   meeting-notes Q&amp;A are written directly into the page — so the bot also fetches the page
   itself and reads those out of it.</p>
