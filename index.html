@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>WhatsApp bot — simple how to do</title>
-<meta name="description" content="A short, honest explanation of how the AS-Sur WhatsApp bot answers the Physicianeers 2026 cohort's logistics questions from the hub - and how to use it.">
+<meta name="description" content="A short explanation of how the AS-Sur WhatsApp bot (Short for Abdel Sattar Surogate) answers the Physicianeers 2026 cohort's logistics questions from the hub - and how to use it.">
 <style>
   :root {
     --bg: #ffffff;
@@ -55,14 +55,9 @@
     border: 1px solid var(--line);
     border-radius: 5px;
     padding: .1em .35em;
-    /* Short trigger tokens like ?sur must never split across two lines:
-       browsers otherwise treat the "?" as a break opportunity and a reader
-       can conclude the trigger is "sur" or "? sur". */
+
     white-space: nowrap;
   }
-  /* Opt-out for long illustrative chips that are wider than a narrow phone:
-     they may wrap between words, while `.nb` keeps a typed token unbreakable
-     inside them. Nobody types the long ones, so wrapping them is harmless. */
   code.wrap { white-space: normal; }
   code .nb { white-space: nowrap; }
   pre {
@@ -77,9 +72,6 @@
   /* Must come after `code { white-space: nowrap }` so the block form keeps its
      own line breaks and its internal horizontal scrolling. */
   pre code { background: none; border: 0; padding: 0; font-size: 1em; white-space: pre; }
-  /* CSS-only cue that a block still scrolls sideways: the two edge shadows are
-     fixed to the box while the two background-coloured covers scroll with the
-     content, so a shadow is only visible on a side that has hidden content. */
   pre.scrolls {
     background-image:
       linear-gradient(to right, var(--code-bg) 60%, rgba(0,0,0,0)),
@@ -92,8 +84,7 @@
     background-attachment: local, local, scroll, scroll;
   }
   .diagram { font-size: .74rem; line-height: 1.35; }
-  /* Trimmed side padding buys the ASCII diagram a few more columns on a phone,
-     so it fits outright instead of hiding its right-hand half behind a swipe. */
+
   @media (max-width: 29.99rem) { .diagram { padding-left: .55rem; padding-right: .55rem; } }
   @media (min-width: 30rem) { .diagram { font-size: .84rem; } }
   .card {
@@ -134,23 +125,23 @@
 <body>
 <main>
 
-  <span class="tag">Physicianeers 2026</span>
+  <span class="tag">G Fadl</span>
   <h1>WhatsApp bot — simple how to do</h1>
-  <p class="lede">What it does, how to use it, and how it was built — in about five minutes.</p>
+  <p class="lede">What it does, how to use it, and how it was built.</p>
 
-  <p>AS-Sur sits in the cohort's WhatsApp group and answers questions about logistics:
+  <p>AS-Sur sits in the batch's WhatsApp group and answers questions about logistics:
   pass marks, retake rules, deadlines, lecture links, which file is where. Everything it
   says comes from the
   <a href="https://mtc-qa-hub.vercel.app/">Physicianeers 2026 hub</a> and nowhere else.
   It is not a general-purpose chatbot: if the hub does not contain the answer, it tells you
-  that instead of inventing one.</p>
+  that instead of inventing one (It can defineitly be adjusted to answer any question but no "no-hallucination" is guranteed then, precision over recall here.</p>
 
   <h2>How to use it</h2>
 
   <div class="howto">
     <p><strong>Three ways to summon it</strong>, inside the cohort's group:</p>
     <ul>
-      <li>Start your message with <code>?sur</code> followed by your question — for example:
+      <li>Start your message with <code>@bot number</code> followed by your question — for example:
       <code class="wrap"><span class="nb">?sur</span> what is the pass mark for the subject?</code></li>
       <li>@mention the bot in your message and ask</li>
       <li>Or reply to any one of its own messages</li>
@@ -164,11 +155,11 @@
     does not reply to, and it never replies in direct messages at all.</p>
   </div>
 
-  <p class="note">In short: start with <code>?sur</code>, @mention it, or reply to it.</p>
+  <p class="note">In short: start with, @mention it, or reply to it.</p>
 
   <h2>How it was made</h2>
 
-  <p>One small program, always running, doing four jobs. No magic anywhere in it.</p>
+  <p>One small program, always running, doing four jobs.</p>
 
 <pre class="diagram scrolls"><code>   WhatsApp group
         |
@@ -209,12 +200,12 @@
   sends Gemini two things: the whole digest, and the student's question — plus firm
   instructions to answer <em>only</em> from the digest and to reply with the exact word
   <code>NO_ANSWER</code> if the answer is not in there. The temperature is set to 0, which
-  means "be as deterministic as you can, do not be creative".</p>
+  means "be as deterministic as you can, do not be creative". If at anypoint the content got large enough we will turn into vector DB and RAG or Graph RAG or any other fancy way, This is one more lessson, simple is good as long as it solves the issue</p>
 
   <h3>3. Listening on WhatsApp</h3>
   <p>WhatsApp has an official business interface, but it does not support group chats at
   all. Group participation is only possible by connecting as a <em>linked device</em>, the
-  same way WhatsApp Web does — which is against WhatsApp's terms of service, and the account
+  same way WhatsApp Web does — which is against WhatsApp's terms of service ;), and the account
   can be banned for it. That is a real trade-off, taken knowingly: the bot therefore runs on
   a dedicated spare number, never anyone's personal one, and it never messages anybody
   first.</p>
@@ -233,8 +224,8 @@
 
   <h2>Simple code</h2>
   <p class="note">Three ideas, simplified for reading. The real code has error handling,
-  caching and tests around each of these; the shape below is honest, but it is not
-  copy-paste ready.</p>
+  caching and tests around each of these; the shape below is representative, but it is not
+  copy-paste ready. This is something you can give to your vibe-coding tool to build but I coudn't share the real code here because it has some IP/API keys</p>
 
   <h3>Reading a database collection over plain HTTP</h3>
 <pre class="scrolls"><code>const base = "https://firestore.googleapis.com/v1";
@@ -265,7 +256,7 @@ CONTENT:
 ${digest}`;
 </code></pre>
   <p class="note">If the reply is <code>NO_ANSWER</code>, the bot never shows that word to
-  students — it swaps it for the bilingual "I can't find this, ask your rep or check the
+  user — it swaps it for the bilingual "I can't find this, ask your rep or check the
   site".</p>
 
   <h3>Deciding whether it was summoned</h3>
@@ -285,12 +276,11 @@ ${digest}`;
 
   <h3>Not every AI app needs a vector database</h3>
   <p>The standard advice is to chop your documents up, turn each piece into numbers
-  ("embeddings"), store them in a special database, and at question time retrieve only the
+  ("embeddings"), store them in a  database, and at question time retrieve only the
   pieces that look relevant. That is called RAG, and it exists because models can only read
   so much text at once.</p>
   <p>We measured the hub first: 86 documents, about 86 KB of text — roughly
-  <span class="stat">15,000</span> tokens (a token is a chunk of a word; the model's reading
-  limit is counted in these). That fits comfortably in a single request. So there is no
+  <span class="stat">15,000</span> tokens . That fits comfortably in a single request. So there is no
   vector database, no embeddings and no chunking here: the entire knowledge base is sent with
   every single question. The model sees everything, every time, so nothing can be missed by a
   bad retrieval step — and there is a whole moving part that simply does not exist and
@@ -304,21 +294,18 @@ ${digest}`;
   something actually changes, instead of the bot repeatedly asking — cost about
   <span class="stat">100</span> reads a day with effectively no staleness. Both numbers moved
   the right way at once, because reads are billed only for documents that really change, and
-  an idle database costs nothing. It mattered for more than money: those reads come from the
-  same free quota the students' own website depends on, so a chatty bot would have degraded
-  the site it serves. (A slow re-read still runs a few times a day, purely as a safety net in
+  an idle database costs nothing. (A slow re-read still runs a few times a day, purely as a safety net in
   case a listener dies quietly.)</p>
 
   <h3>Refusing to answer is a feature, not a failure</h3>
-  <p>The content here is exam rules and programme policy. A confidently wrong answer about a
-  pass mark is far more damaging than no answer at all — a student can act on "I don't know,
+  <p> A confidently wrong answer about a pass mark is far more damaging than no answer at all — a student can act on "I don't know,
   ask your rep"; they cannot recover from a made-up retake rule. So refusal was designed in
   from the start, tested for deliberately, and it is why the prompt has that
   <code>NO_ANSWER</code> escape hatch. The refusal message and the "something broke
   technically" message are also kept as two different sentences, because they ask the student
   to do two different things.</p>
 
-  <p class="card"><strong>A bonus lesson in looking before assuming.</strong> A student asked
+  <p class="card"><strong>A bonus lesson in looking before assuming.</strong> A user asked
   for a lecture link and the bot said it could not find it — even though the link was plainly
   visible on the hub. It turned out the lecture and lab links were hardcoded inside the
   page's own JavaScript, not stored in the database the admin screen writes to. The bot was
@@ -339,7 +326,7 @@ ${digest}`;
   </ul>
 
   <footer>
-    <p>Built for the Physicianeers 2026 cohort. Source of truth:
+    <p>Built for our batch only. Source of truth:
     <a href="https://mtc-qa-hub.vercel.app/">mtc-qa-hub.vercel.app</a>.</p>
   </footer>
 
